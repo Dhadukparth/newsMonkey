@@ -10,7 +10,6 @@ const News = (props) =>  {
     const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
     const [totalResults, setTotalResults] = useState(0)
-    // document.title = `${capitalizeFirstLetter(props.Category)} - NewsMonkey`;
 
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -22,44 +21,32 @@ const News = (props) =>  {
         const url = `https://newsapi.org/v2/top-headlines?country=${props.Country}&category=${props.Category}&apiKey=${props.apiKey}&page=${page}&pagesize=${props.pageSize}`;
         setLoading(true)
         let data = await fetch(url);
-        props.setProgress(50);
+        props.setProgress(30);
         let parsedata = await data.json()
         props.setProgress(70);
         setArticles(parsedata.articles)
-        setLoading(false)
         setTotalResults(parsedata.totalResults)
+        setLoading(false)
         props.setProgress(100);
     }
 
     useEffect(() => {
+        document.title = `${capitalizeFirstLetter(props.Category)} - NewsMonkey`;
         UpdateNews()
     }, [])
-    
-    const hendlePrevClick = async () => {
-        setPage(page - 1)
-        UpdateNews();
-    }
-
-    const hendleNextClick = async () => {
-        if (!(page + 1 > Math.ceil(totalResults / props.pageSize))) {
-            setPage(page + 1)
-            UpdateNews();
-        }
-    }
 
     const fetchMoreData = async () => {
-        const url = `https://newsapi.org/v2/top-headlines?country=${props.Country}&category=${props.Category}&apiKey=38dead3a373c43ad8874ccfa225d848a&page=${page}&pagesize=${props.pageSize}`;
-        setLoading(true)
+        const url = `https://newsapi.org/v2/top-headlines?country=${props.Country}&category=${props.Category}&apiKey=38dead3a373c43ad8874ccfa225d848a&page=${page+1}&pagesize=${props.pageSize}`;
+        setPage(page + 1)
         let data = await fetch(url);
         let parsedata = await data.json()
-        setPage(page + 1)
         setArticles(articles.concat(parsedata.articles))
         setTotalResults(parsedata.totalResults)
     };
 
     return (
         <div className='container my-5'>
-            <h1 className='text-center my-3'>NewsMokey - Top {capitalizeFirstLetter(props.Category)} Headlines</h1>
+            <h1 className='text-center' style={{marginTop: '90px'}}>NewsMokey - Top {capitalizeFirstLetter(props.Category)} Headlines</h1>
             {loading && <Spinner />}
             <InfiniteScroll
                 dataLength={articles.length}
